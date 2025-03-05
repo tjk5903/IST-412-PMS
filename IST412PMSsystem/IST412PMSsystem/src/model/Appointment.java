@@ -1,5 +1,3 @@
-// testing git.
-
 package model;
 
 import model.Doctor;
