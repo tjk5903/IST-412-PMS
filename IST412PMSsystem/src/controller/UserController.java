@@ -27,9 +27,9 @@ public class UserController {
      * @param userID The ID of the user.
      * @return The User object if found, otherwise null.
      */
-    public User getUserById(int userID) {
+    public User getUserById(String userID) {
         Optional<User> user = users.stream()
-                .filter(u -> u.getUserID() == userID) // Assuming the User class has an `getId` method
+                .filter(u -> u.getUserID().equals(userID)) // Assuming the User class has an `getId` method
                 .findFirst();
         return user.orElse(null);
     }
@@ -40,9 +40,9 @@ public class UserController {
      * @param userID The ID of the user to be deleted.
      * @return true if deletion was successful, false otherwise.
      */
-    public boolean deleteUser(int userID) {
+    public boolean deleteUser(String userID) {
         Optional<User> user = users.stream()
-                .filter(u -> u.getUserID() == userID)
+                .filter(u -> u.getUserID().equals(userID))
                 .findFirst();
 
         if (user.isPresent()) {
