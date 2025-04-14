@@ -4,6 +4,22 @@
 ___
 >This project is about creating a functional Patient Management System (PMS). There are many stakeholders to think of in this situation as well as a large amount of rules and regulations to follow such as HIPAA. Within this project there should be the management of prescriptions from both sides of either the patient and the doctor/care team. The nurses and doctors should be able to see the medical history, but the nurse will not be able to edit it they will be able to leave detailed notes for the doctor to look over.
 ____
+
+# **Connecting to Database**
+
+    There is a necessary driver for MySQL so that the database can run.
+
+    Download Platform Independent from here --> https://dev.mysql.com/downloads/connector/j/
+    
+    Once downloaded:
+
+        1. Right-click the project, and open Open Module Settings
+        2. Modules > Dependencies
+        3. Click the + icon > JARs or Directories
+        4. Select the .jar file, something like mysql-connector-j-8.0.33.jar
+        5. Make sure it's set to Compile
+        6. Apply > OK
+
 <!-- TESTING LOGIN INFORMATION-->
 
 # **Logins**

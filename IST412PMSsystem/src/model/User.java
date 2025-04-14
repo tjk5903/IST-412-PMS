@@ -62,12 +62,12 @@ public abstract class User {
     public String verifyUser(){
         String roleID = "";
         try {
-            //  Connection conn = DriverManager.getConnection("jdbc:ucanaccess://src/newsPublishDB.accdb");
+            // Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb");
             Connection conn = DriverManager.getConnection(
                     "jdbc:mysql://localhost:3306/healthPlusDB?user=root&password=root123&useSSL=false");
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery("select UserRole, UserName from User " +
-                    "where UserID = \"" + userID + "\" and UserPassword = \""
+                    "where UserLogin = \"" + userID + "\" and UserPassword = \""
                     + password + "\"" );
             if(rs.next()){
                 System.out.println("User Authenticated");
