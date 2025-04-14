@@ -1,26 +1,61 @@
 package controller;
 
 import model.Patient;
-import view.PatientView;
+import model.UserFactory;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PatientController {
 
-    private PatientView patientView;
+    private final String DB_URL = "jdbc:mysql://localhost:3306/healthPlusDB?user=root&password=root123&useSSL=false";
 
-    public PatientController(PatientView patientView) {
-        this.patientView = patientView;
+    // ✅ Adds a patient to the DB using the UserFactory
+    public void addPatient(String name, String contact, String password, String login, int age, String disease) {
+        Patient patient = UserFactory.createPatient(name, contact, password, login, age, disease);
+
+        if (patient != null) {
+            System.out.println("Patient added: " + patient.getName());
+        } else {
+            System.out.println("Failed to add patient.");
+        }
     }
 
-    // Adds a new patient
-    public void addPatient(int patientID, String name, int age, String gender, String contact, String address) {
-        Patient patient = new Patient(patientID, name, age, gender, contact, address, null);
-        Patient.addPatientToList(patient);
-        System.out.println("Patient added: " + name);
+    // ✅ Pulls patients from the DB
+    public List<Patient> getAllPatients() {
+        List<Patient> patients = new ArrayList<>();
+
+        try {
+            Connection conn = DriverManager.getConnection(DB_URL);
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM Patient");
+
+            while (rs.next()) {
+                int userID = rs.getInt("UserID");
+                String name = rs.getString("PatientName");
+                int age = rs.getInt("Age");
+                String disease = rs.getString("Disease");
+
+                // Dummy data for fields not in table
+                Patient patient = new Patient(userID, name, age, "Unknown", "N/A", "N/A", "N/A", "N/A", "Patient");
+                patients.add(patient);
+            }
+
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return patients;
     }
 
-    // Displays all patients
+    // ✅ Print all patient info
     public void displayPatients() {
-        Patient[] patients = Patient.getAllPatients();
+        List<Patient> patients = getAllPatients();
         for (Patient patient : patients) {
             System.out.println("Patient: " + patient.getName() + ", Age: " + patient.getAge());
         }

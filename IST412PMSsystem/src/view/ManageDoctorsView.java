@@ -1,10 +1,15 @@
 package view;
 
+import model.Doctor;
+import model.UserFactory;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 public class ManageDoctorsView extends JFrame {
     private JTable doctorsTable;
@@ -19,13 +24,9 @@ public class ManageDoctorsView extends JFrame {
 
         // Table for doctors
         String[] columnNames = {"Doctor ID", "Name", "Specialization"};
-        Object[][] data = {
-                {"D001", "Dr. Smith", "Cardiology"},
-                {"D002", "Dr. Williams", "Neurology"}
-        };
-
-        tableModel = new DefaultTableModel(data, columnNames);
+        tableModel = new DefaultTableModel(columnNames, 0); // Start empty
         doctorsTable = new JTable(tableModel);
+        loadDoctorsFromDatabase(); // Fill from DB
 
         // Scrollable table
         JScrollPane scrollPane = new JScrollPane(doctorsTable);
@@ -53,28 +54,48 @@ public class ManageDoctorsView extends JFrame {
         setVisible(true);
     }
 
-    private void addDoctor() {
-        // Add a new doctor to the table (use dialog for details)
-        String doctorID = JOptionPane.showInputDialog(this, "Enter Doctor ID:");
-        String doctorName = JOptionPane.showInputDialog(this, "Enter Doctor Name:");
-        String specialization = JOptionPane.showInputDialog(this, "Enter Specialization:");
+    private void loadDoctorsFromDatabase() {
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb");
+            //Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/healthPlusDB?user=root&password=root123&useSSL=false");
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM Doctor");
+            while (rs.next()) {
+                int id = rs.getInt("DoctorID");
+                String name = rs.getString("DoctorName");
+                String specialization = rs.getString("Specialty");
 
-        // Add to table
-        tableModel.addRow(new Object[]{doctorID, doctorName, specialization});
+                tableModel.addRow(new Object[]{id, name, specialization});
+            }
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error loading doctors from database.", "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void addDoctor() {
+        String name = JOptionPane.showInputDialog(this, "Enter Doctor Name:");
+        String contact = JOptionPane.showInputDialog(this, "Enter Contact Info:");
+        String login = JOptionPane.showInputDialog(this, "Enter Login Username:");
+        String password = JOptionPane.showInputDialog(this, "Enter Password:");
+        String specialization = JOptionPane.showInputDialog(this, "Enter Specialization:");
+        Doctor doctor = UserFactory.createDoctor(name, contact, password, login, specialization);
+        if (doctor != null) {
+            tableModel.addRow(new Object[]{doctor.getUserID(), doctor.getName(), specialization});
+        } else {
+            JOptionPane.showMessageDialog(this, "Error creating doctor. Check inputs.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void editDoctor() {
         int selectedRow = doctorsTable.getSelectedRow();
         if (selectedRow != -1) {
-            String doctorID = (String) doctorsTable.getValueAt(selectedRow, 0);
-            String doctorName = (String) doctorsTable.getValueAt(selectedRow, 1);
-            String specialization = (String) doctorsTable.getValueAt(selectedRow, 2);
-
-            // Edit the doctor (using dialog for new details)
+            String doctorID = doctorsTable.getValueAt(selectedRow, 0).toString();
+            String doctorName = doctorsTable.getValueAt(selectedRow, 1).toString();
+            String specialization = doctorsTable.getValueAt(selectedRow, 2).toString();
             String newName = JOptionPane.showInputDialog(this, "Edit Doctor Name", doctorName);
             String newSpecialization = JOptionPane.showInputDialog(this, "Edit Specialization", specialization);
-
-            // Update table
             tableModel.setValueAt(newName, selectedRow, 1);
             tableModel.setValueAt(newSpecialization, selectedRow, 2);
         } else {
@@ -85,15 +106,30 @@ public class ManageDoctorsView extends JFrame {
     private void deleteDoctor() {
         int selectedRow = doctorsTable.getSelectedRow();
         if (selectedRow != -1) {
-            tableModel.removeRow(selectedRow);
+            int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this doctor?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                int userID = (int) doctorsTable.getValueAt(selectedRow, 0);  // Assuming first column is ID
+                try {
+                    //Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb");
+                    Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/healthPlusDB?user=root&password=root123&useSSL=false");
+                    Statement stmt = conn.createStatement();
+                    stmt.executeUpdate("DELETE FROM Doctor WHERE DoctorID = " + userID);
+                    stmt.executeUpdate("DELETE FROM User WHERE UserID = " + userID);
+                    conn.close();
+                    tableModel.removeRow(selectedRow);
+                    JOptionPane.showMessageDialog(this, "Doctor deleted successfully.");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "Error deleting doctor from database.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
         } else {
             JOptionPane.showMessageDialog(this, "Please select a doctor to delete.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void goBack() {
-        // Go back to the main menu
         this.dispose();
-        new MainMenuView("admin"); // Pass the role of the user (admin)
+        new MainMenuView("admin");
     }
 }

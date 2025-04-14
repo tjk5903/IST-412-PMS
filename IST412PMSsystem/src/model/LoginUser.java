@@ -1,8 +1,9 @@
 package model;
 
 public class LoginUser extends User {
-    public LoginUser(String userID, String password) {
-        super(userID, password);
+    public LoginUser(String login, String password) {
+        this.login = login;
+        this.password = password;
     }
 
     @Override

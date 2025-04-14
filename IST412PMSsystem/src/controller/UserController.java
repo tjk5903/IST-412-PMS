@@ -1,55 +1,102 @@
 package controller;
 
 import model.User;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-/**
- * Controller for managing user accounts and authentication.
- */
 public class UserController {
 
-    private static List<User> users = new ArrayList<>(); // List to store registered users
+    private final String DB_URL = "jdbc:mysql://localhost:3306/healthPlusDB?user=root&password=root123&useSSL=false";
 
-    /**
-     * Retrieves all registered users.
-     *
-     * @return A list of all users.
-     */
     public List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
+
+        try {
+            Connection conn = DriverManager.getConnection(DB_URL);
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM User");
+
+            while (rs.next()) {
+                int userID = rs.getInt("UserID");
+                String name = rs.getString("UserName");
+                String contact = rs.getString("UserContact");
+                String password = rs.getString("UserPassword");
+                String login = rs.getString("UserLogin");
+                String role = rs.getString("UserRole");
+
+                users.add(new User(userID, name, contact, password, login, role) {
+                    @Override
+                    public String getUserInfo() {
+                        return name + " (" + role + ")";
+                    }
+
+                    @Override
+                    public String getRole() {
+                        return role;
+                    }
+                });
+            }
+
+            conn.close();
+        } catch (Exception e) {
+            System.out.println("Error loading users: " + e.getMessage());
+            e.printStackTrace();
+        }
+
         return users;
     }
 
-    /**
-     * Retrieves a user by their ID.
-     *
-     * @param userID The ID of the user.
-     * @return The User object if found, otherwise null.
-     */
-    public User getUserById(String userID) {
-        Optional<User> user = users.stream()
-                .filter(u -> u.getUserID().equals(userID)) // Assuming the User class has an `getId` method
-                .findFirst();
-        return user.orElse(null);
+    public User getUserById(int userID) {
+        try {
+            Connection conn = DriverManager.getConnection(DB_URL);
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM User WHERE UserID = '" + userID + "'");
+
+            if (rs.next()) {
+                String name = rs.getString("UserName");
+                String contact = rs.getString("UserContact");
+                String password = rs.getString("UserPassword");
+                String login = rs.getString("UserLogin");
+                String role = rs.getString("UserRole");
+
+                conn.close();
+                return new User(userID, name, contact, password, login, role) {
+                    @Override
+                    public String getUserInfo() {
+                        return name + " (" + role + ")";
+                    }
+
+                    @Override
+                    public String getRole() {
+                        return role;
+                    }
+                };
+            }
+            conn.close();
+        } catch (Exception e) {
+            System.out.println("Error finding user: " + e.getMessage());
+        }
+        return null;
     }
 
-    /**
-     * Deletes a user account.
-     *
-     * @param userID The ID of the user to be deleted.
-     * @return true if deletion was successful, false otherwise.
-     */
+
     public boolean deleteUser(String userID) {
-        Optional<User> user = users.stream()
-                .filter(u -> u.getUserID().equals(userID))
-                .findFirst();
+        try {
+            Connection conn = DriverManager.getConnection(DB_URL);
+            Statement stmt = conn.createStatement();
 
-        if (user.isPresent()) {
-            users.remove(user.get()); // Remove user from the list
-            return true;
+            int affected = stmt.executeUpdate("DELETE FROM User WHERE UserID = '" + userID + "'");
+            conn.close();
+
+            return affected > 0;
+        } catch (Exception e) {
+            System.out.println("Error deleting user: " + e.getMessage());
         }
-
-        return false; // User not found
+        return false;
     }
 }
