@@ -7,8 +7,9 @@ ____
 
 # **Connecting to Database**
 
-    There is a necessary driver for MySQL so that the database can run.
+There are necessary drivers to download depending on what database you use.
 
+## MySQL
     Download Platform Independent from here --> https://dev.mysql.com/downloads/connector/j/
     
     Once downloaded:
@@ -19,6 +20,27 @@ ____
         4. Select the .jar file, something like mysql-connector-j-8.0.33.jar
         5. Make sure it's set to Compile
         6. Apply > OK
+
+## .accdb Database
+
+    Download from here --> http://ucanaccess.sourceforge.net/site.html
+
+    Once downloaded:
+
+        1. Right-click the project, and open Open Module Settings
+        2. Modules > Dependencies
+        3. Click the + icon > JARs or Directories
+        4. There are five .jar files to select:
+
+            ucanaccess-x.x.x.jar
+            jackcess-x.x.x.jar
+            commons-lang-x.x.jar
+            commons-logging-x.x.jar
+            hsqldb.jar 
+
+        5. Make sure they're set to Compile
+        6. Apply > OK
+
 
 <!-- TESTING LOGIN INFORMATION-->
 
