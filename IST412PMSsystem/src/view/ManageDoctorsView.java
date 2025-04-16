@@ -60,11 +60,11 @@ public class ManageDoctorsView extends JFrame {
             //Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/healthPlusDB?user=root&password=root123&useSSL=false");
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * FROM Doctor");
+
             while (rs.next()) {
                 int id = rs.getInt("DoctorID");
                 String name = rs.getString("DoctorName");
                 String specialization = rs.getString("Specialty");
-
                 tableModel.addRow(new Object[]{id, name, specialization});
             }
             conn.close();
@@ -80,6 +80,7 @@ public class ManageDoctorsView extends JFrame {
         String login = JOptionPane.showInputDialog(this, "Enter Login Username:");
         String password = JOptionPane.showInputDialog(this, "Enter Password:");
         String specialization = JOptionPane.showInputDialog(this, "Enter Specialization:");
+
         Doctor doctor = UserFactory.createDoctor(name, contact, password, login, specialization);
         if (doctor != null) {
             tableModel.addRow(new Object[]{doctor.getUserID(), doctor.getName(), specialization});
@@ -91,11 +92,12 @@ public class ManageDoctorsView extends JFrame {
     private void editDoctor() {
         int selectedRow = doctorsTable.getSelectedRow();
         if (selectedRow != -1) {
-            String doctorID = doctorsTable.getValueAt(selectedRow, 0).toString();
             String doctorName = doctorsTable.getValueAt(selectedRow, 1).toString();
             String specialization = doctorsTable.getValueAt(selectedRow, 2).toString();
+
             String newName = JOptionPane.showInputDialog(this, "Edit Doctor Name", doctorName);
             String newSpecialization = JOptionPane.showInputDialog(this, "Edit Specialization", specialization);
+
             tableModel.setValueAt(newName, selectedRow, 1);
             tableModel.setValueAt(newSpecialization, selectedRow, 2);
         } else {
@@ -108,14 +110,15 @@ public class ManageDoctorsView extends JFrame {
         if (selectedRow != -1) {
             int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this doctor?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
-                int userID = (int) doctorsTable.getValueAt(selectedRow, 0);  // Assuming first column is ID
+                int userID = (int) doctorsTable.getValueAt(selectedRow, 0);
                 try {
-                    //Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb");
-                    Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/healthPlusDB?user=root&password=root123&useSSL=false");
+                    Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb");
+                    //Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/healthPlusDB?user=root&password=root123&useSSL=false");
                     Statement stmt = conn.createStatement();
                     stmt.executeUpdate("DELETE FROM Doctor WHERE DoctorID = " + userID);
                     stmt.executeUpdate("DELETE FROM User WHERE UserID = " + userID);
                     conn.close();
+
                     tableModel.removeRow(selectedRow);
                     JOptionPane.showMessageDialog(this, "Doctor deleted successfully.");
                 } catch (Exception e) {

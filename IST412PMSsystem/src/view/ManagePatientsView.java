@@ -57,10 +57,11 @@ public class ManagePatientsView extends JFrame {
 
     private void loadPatientsFromDatabase() {
         try {
-            //Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb");
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/healthPlusDB?user=root&password=root123&useSSL=false");
+            Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb");
+            //Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/healthPlusDB?user=root&password=root123&useSSL=false");
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * FROM Patient");
+
             while (rs.next()) {
                 int id = rs.getInt("PatientID");
                 String name = rs.getString("PatientName");
@@ -68,6 +69,7 @@ public class ManagePatientsView extends JFrame {
                 String disease = rs.getString("Disease");
                 tableModel.addRow(new Object[]{id, name, age, disease});
             }
+
             conn.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -95,13 +97,14 @@ public class ManagePatientsView extends JFrame {
     private void editPatient() {
         int selectedRow = patientsTable.getSelectedRow();
         if (selectedRow != -1) {
-            String patientID = patientsTable.getValueAt(selectedRow, 0).toString();
             String patientName = patientsTable.getValueAt(selectedRow, 1).toString();
             String age = patientsTable.getValueAt(selectedRow, 2).toString();
             String disease = patientsTable.getValueAt(selectedRow, 3).toString();
+
             String newName = JOptionPane.showInputDialog(this, "Edit Patient Name", patientName);
             String newAge = JOptionPane.showInputDialog(this, "Edit Age", age);
             String newDisease = JOptionPane.showInputDialog(this, "Edit Disease", disease);
+
             tableModel.setValueAt(newName, selectedRow, 1);
             tableModel.setValueAt(newAge, selectedRow, 2);
             tableModel.setValueAt(newDisease, selectedRow, 3);
@@ -115,25 +118,17 @@ public class ManagePatientsView extends JFrame {
         if (selectedRow != -1) {
             int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this patient?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
-                String patientName = (String) patientsTable.getValueAt(selectedRow, 1);  // Assuming column 1 is the Name
+                int patientID = (int) patientsTable.getValueAt(selectedRow, 0);
                 try {
                     Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb");
                     //Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/healthPlusDB?user=root&password=root123&useSSL=false");
                     Statement stmt = conn.createStatement();
-                    ResultSet rs = stmt.executeQuery("SELECT PatientID FROM Patient WHERE PatientName = '" + patientName + "'");
-                    if (rs.next()) {
-                        int userID = rs.getInt("PatientID");
-                        stmt.executeUpdate("DELETE FROM Patient WHERE PatientID = " + userID);
-                        stmt.executeUpdate("DELETE FROM User WHERE UserID = " + userID);
-                        tableModel.removeRow(selectedRow);
-                        JOptionPane.showMessageDialog(this, "Patient deleted successfully.");
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Patient not found in the database.", "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                    rs.close();
-                    stmt.close();
+                    stmt.executeUpdate("DELETE FROM Patient WHERE PatientID = " + patientID);
+                    stmt.executeUpdate("DELETE FROM User WHERE UserID = " + patientID);
                     conn.close();
 
+                    tableModel.removeRow(selectedRow);
+                    JOptionPane.showMessageDialog(this, "Patient deleted successfully.");
                 } catch (Exception e) {
                     e.printStackTrace();
                     JOptionPane.showMessageDialog(this, "Error deleting patient from database.", "Error", JOptionPane.ERROR_MESSAGE);

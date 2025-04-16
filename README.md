@@ -49,40 +49,18 @@ There are necessary drivers to download depending on what database you use.
 _________________________
 ## Doctors
 ### Test Doctor 1
-    username: testDoctor1 
-    password: doctorPass1
-### Test Doctor 2
-    username: testDoctor2
-    password: doctorPass2
-
-## Nurses
-### Test Nurse 1
-	username: testNurse1
-    password: nursePass1
-### Test Nurse 2
-    username: testNurse2
-    password: nursePass2
+    username: doctor1 
+    password: pass123
 
 ## Patients
 ### Test Patient 1
-	username: testPatient1
-    password: patientPass1
-### Test Patient 2
-    username: testPatient2
-    password: patientPass2
-### Test Patient 3
-    username: testPatient3
-    password: patientPass3
+	username: patient1
+    password: pass123
 
 ## System Administrators
 ### Test System Admin 1
-	username: testSysAd1
-    password: sysAdPass1
-
-## Cybersecurity Specialists
-### Test Cyber Specialist 1
-	username: testCyber1
-	password: cyberPass1
+	username: admin1
+    password: admin123
 
 ___
 <!-- USAGE EXAMPLES -->

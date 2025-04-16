@@ -9,9 +9,8 @@ public class UserFactory {
         Doctor doctor = null;
 
         try {
-            //Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb");
-            Connection conn = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/healthPlusDB?user=root&password=root123&useSSL=false");
+            Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb");
+            //Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/healthPlusDB?user=root&password=root123&useSSL=false");
 
             Statement st = conn.createStatement();
             String inUser = "INSERT INTO User (UserID, UserName, UserContact, UserPassword, UserLogin, UserRole) " +
@@ -40,9 +39,8 @@ public class UserFactory {
         Patient patient = null;
 
         try {
-            //Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb");
-            Connection conn = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/healthPlusDB?user=root&password=root123&useSSL=false");
+            Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb");
+            //Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/healthPlusDB?user=root&password=root123&useSSL=false");
 
             Statement st = conn.createStatement();
 
@@ -70,8 +68,8 @@ public class UserFactory {
     private static int getNextAvailableUserID() {
         int maxID = 0;
         try {
-            //Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb");
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/healthPlusDB?user=root&password=root123&useSSL=false");
+            Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb");
+            //Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/healthPlusDB?user=root&password=root123&useSSL=false");
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery("SELECT MAX(UserID) AS MaxID FROM User");
             if (rs.next()) {
