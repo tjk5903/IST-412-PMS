@@ -8,6 +8,8 @@ import java.awt.event.ActionListener;
 
 public class ManageAppointmentsView extends JFrame {
     private String userRole;
+    private DefaultTableModel model;
+    private JTable table;
 
     // Constructor with userRole parameter
     public ManageAppointmentsView(String userRole) {
@@ -26,8 +28,8 @@ public class ManageAppointmentsView extends JFrame {
         };
 
         // Create a table model with the data
-        DefaultTableModel model = new DefaultTableModel(data, columns);
-        JTable table = new JTable(model);
+        model = new DefaultTableModel(data, columns);
+        table = new JTable(model);
 
         // Add table to scroll pane for better usability
         JScrollPane scrollPane = new JScrollPane(table);
@@ -42,7 +44,7 @@ public class ManageAppointmentsView extends JFrame {
         buttonPanel.add(addButton);
 
         JButton cancelButton = new JButton("Cancel Appointment");
-        cancelButton.addActionListener(e -> cancelAppointment(table));
+        cancelButton.addActionListener(e -> cancelAppointment());
         buttonPanel.add(cancelButton);
 
         add(buttonPanel, BorderLayout.SOUTH);
@@ -56,18 +58,47 @@ public class ManageAppointmentsView extends JFrame {
     }
 
     private void addAppointment() {
-        // You can create a dialog or new window to add a new appointment
-        JOptionPane.showMessageDialog(this, "Adding a new appointment...");
-        // Logic for adding an appointment would go here (e.g., open another view for scheduling)
+        // Open a dialog to add a new appointment
+        JTextField appointmentIdField = new JTextField(10);
+        JTextField doctorField = new JTextField(10);
+        JTextField dateField = new JTextField(10);
+        JTextField timeField = new JTextField(10);
+        JTextField statusField = new JTextField(10);
+
+        JPanel panel = new JPanel(new GridLayout(5, 2));
+        panel.add(new JLabel("Appointment ID:"));
+        panel.add(appointmentIdField);
+        panel.add(new JLabel("Doctor:"));
+        panel.add(doctorField);
+        panel.add(new JLabel("Date (YYYY-MM-DD):"));
+        panel.add(dateField);
+        panel.add(new JLabel("Time (HH:MM AM/PM):"));
+        panel.add(timeField);
+        panel.add(new JLabel("Status:"));
+        panel.add(statusField);
+
+        int option = JOptionPane.showConfirmDialog(this, panel, "Enter Appointment Details", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            // Add new row to the table (this should be validated in real use cases)
+            String appointmentId = appointmentIdField.getText();
+            String doctor = doctorField.getText();
+            String date = dateField.getText();
+            String time = timeField.getText();
+            String status = statusField.getText();
+
+            // Add new appointment to the model
+            model.addRow(new Object[]{appointmentId, doctor, date, time, status});
+        }
     }
 
-    private void cancelAppointment(JTable table) {
+    private void cancelAppointment() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow >= 0) {
             // Get the Appointment ID and cancel the selected appointment
             String appointmentId = (String) table.getValueAt(selectedRow, 0);
             JOptionPane.showMessageDialog(this, "Canceling appointment: " + appointmentId);
-            // Logic for canceling the appointment would go here (e.g., remove from database)
+            // Remove the canceled appointment from the table
+            model.removeRow(selectedRow);
         } else {
             JOptionPane.showMessageDialog(this, "Please select an appointment to cancel.");
         }

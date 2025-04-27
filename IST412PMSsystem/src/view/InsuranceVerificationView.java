@@ -25,7 +25,7 @@ public class InsuranceVerificationView extends JFrame {
         verifyButton = new JButton("Verify Insurance");
         backButton = new JButton("Back");
 
-        // Add action listeners
+
         verifyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -40,7 +40,7 @@ public class InsuranceVerificationView extends JFrame {
             }
         });
 
-        // Add components to the frame
+
         add(patientIDLabel);
         add(patientIDField);
         add(insuranceStatusLabel);
@@ -52,22 +52,20 @@ public class InsuranceVerificationView extends JFrame {
     }
 
     private void verifyInsurance() {
-        // Simulate the insurance verification logic
         String patientID = patientIDField.getText();
 
-        // Dummy check for now (You can replace this with a real database/service check)
+
         if (patientID.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please enter a Patient ID", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
-            // For simplicity, we will simulate the status based on Patient ID
-            String insuranceStatus = "Verified";  // This would be dynamic in a real app
+            String insuranceStatus = "Verified";
             insuranceStatusField.setText(insuranceStatus);
         }
     }
 
     private void goBack() {
         // Go back to the main menu
-        this.dispose();  // Close the current window
-        new MainMenuView("admin"); // Assuming 'MainMenuView' is the class for the main menu, passing "admin" as user role
+        this.dispose();
+        new MainMenuView("admin");
     }
 }

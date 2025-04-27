@@ -1,37 +1,40 @@
 package view;
 
+import repository.PrescriptionRepository;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.sql.Connection;
+import java.util.List;
 
 public class ViewPrescriptionsView extends JFrame {
     private String userRole;
+    private Connection connection;
 
-    // Constructor with userRole parameter
-    public ViewPrescriptionsView(String userRole) {
-        this.userRole = userRole; // Store user role
+    // Constructor with userRole and Connection parameters
+    public ViewPrescriptionsView(String userRole, Connection connection) {
+        this.userRole = userRole;
+        this.connection = connection;
+
         setTitle("View Prescriptions");
         setSize(600, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Create a table to display prescription records
         String[] columns = {"Prescription ID", "Medication", "Dosage", "Start Date", "End Date"};
-        Object[][] data = {
-                {"RX001", "Medicine A", "1 pill daily", "2025-01-01", "2025-02-01"},
-                {"RX002", "Medicine B", "2 pills daily", "2025-01-10", "2025-02-10"},
-                {"RX003", "Medicine C", "1 pill twice daily", "2025-02-05", "2025-03-05"}
-        };
 
-        // Create a table model with the data
+        PrescriptionRepository repo = new PrescriptionRepository(connection);
+        List<String[]> prescriptionList = repo.getAllPrescriptions();
+
+        Object[][] data = prescriptionList.toArray(new Object[0][]);
+
         DefaultTableModel model = new DefaultTableModel(data, columns);
         JTable table = new JTable(model);
 
-        // Add table to scroll pane for better usability
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
 
-        // Button to go back to the main menu
         JButton backButton = new JButton("Back to Main Menu");
         backButton.addActionListener(e -> goBackToMainMenu());
         add(backButton, BorderLayout.SOUTH);
@@ -41,6 +44,6 @@ public class ViewPrescriptionsView extends JFrame {
 
     private void goBackToMainMenu() {
         dispose();
-        new MainMenuView(userRole); // Pass the user role when returning to the main menu
+        new MainMenuView(userRole); // You might need to also pass connection depending on how your MainMenuView is set up
     }
 }
