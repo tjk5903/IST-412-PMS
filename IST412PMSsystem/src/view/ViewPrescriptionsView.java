@@ -13,7 +13,7 @@ public class ViewPrescriptionsView extends JFrame {
     private Connection connection;
 
     // Constructor with userRole and Connection parameters
-    public ViewPrescriptionsView(String userRole, Connection connection) {
+    public ViewPrescriptionsView(String userRole) {
         this.userRole = userRole;
         this.connection = connection;
 
