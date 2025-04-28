@@ -1,13 +1,15 @@
 package view;
 
-import view.MainMenuView;
+import model.Doctor;
+import model.Patient;
 import model.User;
 import model.LoginUser;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.HashMap;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 public class LoginView extends JFrame {
     private JTextField usernameField;
@@ -19,7 +21,6 @@ public class LoginView extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new GridLayout(4, 2));
 
-        // UI Elements
         add(new JLabel("Username:"));
         usernameField = new JTextField();
         add(usernameField);
@@ -48,13 +49,68 @@ public class LoginView extends JFrame {
         if (!role.equals("")) {
             JOptionPane.showMessageDialog(this, "Login Successful! Redirecting...");
             dispose();
-            new MainMenuView(role);
+
+            if (role.equalsIgnoreCase("patient")) {
+                Patient patient = getPatientFromDatabase(username);
+                new MainMenuView(role, patient);
+            } else if (role.equalsIgnoreCase("doctor")) {
+                Doctor doctor = getDoctorFromDatabase(username);
+                new MainMenuView(role, doctor);
+            } else {
+                new MainMenuView(role);
+            }
         } else {
             JOptionPane.showMessageDialog(this, "Invalid username or password!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    // Test the LoginView
+    private Patient getPatientFromDatabase(String username) {
+        Patient patient = null;
+        try (Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb")) {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM User WHERE UserLogin = '" + username + "'");
+            if (rs.next()) {
+                int userId = rs.getInt("UserID");
+                String name = rs.getString("UserName");
+                String contact = rs.getString("UserContact");
+                String password = rs.getString("UserPassword");
+                String login = rs.getString("UserLogin");
+                String role = rs.getString("UserRole");
+
+                int age = 30;
+                String gender = "Unknown";
+                String address = "Unknown";
+                patient = new Patient(userId, name, age, gender, contact, address, password, login, role);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return patient;
+    }
+
+    private Doctor getDoctorFromDatabase(String username) {
+        Doctor doctor = null;
+        try (Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb")) {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM User WHERE UserLogin = '" + username + "'");
+
+            if (rs.next()) {
+                int userId = rs.getInt("UserID");
+                String name = rs.getString("UserName");
+                String contact = rs.getString("UserContact");
+                String password = rs.getString("UserPassword");
+                String login = rs.getString("UserLogin");
+                String role = rs.getString("UserRole");
+
+                String specialty = "General";
+                doctor = new Doctor(userId, name, specialty, contact, password, login, role);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return doctor;
+    }
+
     public static void main(String[] args) {
         new LoginView();
     }

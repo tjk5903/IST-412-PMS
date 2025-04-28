@@ -1,31 +1,35 @@
 package view;
 
 import repository.PrescriptionRepository;
+import model.Patient;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ViewPrescriptionsView extends JFrame {
     private String userRole;
-    private Connection connection;
+    private Patient loggedInPatient;
 
-    // Constructor with userRole and Connection parameters
-    public ViewPrescriptionsView(String userRole, Connection connection) {
+    public ViewPrescriptionsView(String userRole, Patient loggedInPatient) {
         this.userRole = userRole;
-        this.connection = connection;
+        this.loggedInPatient = loggedInPatient;
 
-        setTitle("View Prescriptions");
+        setTitle("View My Prescriptions");
         setSize(600, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        String[] columns = {"Prescription ID", "Medication", "Dosage", "Start Date", "End Date"};
+        String[] columns = {"Prescription ID", "Medication", "Dosage", "Frequency"};
 
-        PrescriptionRepository repo = new PrescriptionRepository(connection);
-        List<String[]> prescriptionList = repo.getAllPrescriptions();
+        PrescriptionRepository repo = new PrescriptionRepository();
+        List<String[]> prescriptionList = repo.getPrescriptionsByPatientId(loggedInPatient.getUserID());
 
         Object[][] data = prescriptionList.toArray(new Object[0][]);
 
@@ -44,6 +48,6 @@ public class ViewPrescriptionsView extends JFrame {
 
     private void goBackToMainMenu() {
         dispose();
-        new MainMenuView(userRole); // You might need to also pass connection depending on how your MainMenuView is set up
+        new MainMenuView(userRole, loggedInPatient);
     }
 }

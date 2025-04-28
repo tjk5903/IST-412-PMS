@@ -1,6 +1,6 @@
 package model;
 
-public class Patient extends User {
+public class Patient extends User implements Observer {
     private int age;
     private String gender;
     private String address;
@@ -28,4 +28,9 @@ public class Patient extends User {
     public void setGender(String gender) { this.gender = gender; }
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
+
+    @Override
+    public void update(String message) {
+        System.out.println("Notification for Patient " + name + ": " + message);
+    }
 }

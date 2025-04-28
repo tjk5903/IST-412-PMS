@@ -1,6 +1,6 @@
 package model;
 
-public class Doctor extends User {
+public class Doctor extends User implements Observer {
     private String specialty;
 
     public Doctor(int userID, String name, String specialization, String contact, String password, String login, String role) {
@@ -20,4 +20,9 @@ public class Doctor extends User {
 
     public String getSpecialty() { return specialty; }
     public void setSpecialty(String specialty) { this.specialty = specialty; }
+
+    @Override
+    public void update(String message) {
+        System.out.println("Notification for Doctor " + name + ": " + message);
+    }
 }

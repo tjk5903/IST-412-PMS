@@ -1,47 +1,70 @@
 package view;
 
+import controller.AppointmentController;
+import model.Patient;
+import model.Doctor;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.sql.*;
 
 public class ManageAppointmentsView extends JFrame {
     private String userRole;
+    private int userId;
+    private String doctorName;
+    private Doctor loggedInDoctor;
+
+    private Patient loggedInPatient;
     private DefaultTableModel model;
     private JTable table;
 
-    // Constructor with userRole parameter
+    public ManageAppointmentsView(String userRole, Patient patient) {
+        this.userRole = userRole;
+        this.userId = patient.getUserID();
+        this.doctorName = null;
+        this.loggedInPatient = patient;
+        initUI();
+    }
+
+    public ManageAppointmentsView(String userRole, Doctor doctor) {
+        this.userRole = userRole;
+        this.userId = -1;
+        this.loggedInDoctor = doctor;
+        this.doctorName = doctor.getName();
+        this.loggedInPatient = null;
+        initUI();
+    }
+
     public ManageAppointmentsView(String userRole) {
-        this.userRole = userRole; // Store user role
+        this.userRole = userRole;
+        this.userId = -1;
+        this.doctorName = null;
+        this.loggedInPatient = null;
+        initUI();
+    }
+
+    private void initUI() {
         setTitle("Manage Appointments");
-        setSize(600, 400);
+        setSize(700, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Create a table to display current appointments
-        String[] columns = {"Appointment ID", "Doctor", "Date", "Time", "Status"};
-        Object[][] data = {
-                {"A001", "Dr. Smith", "2025-01-15", "10:00 AM", "Scheduled"},
-                {"A002", "Dr. Johnson", "2025-01-20", "02:00 PM", "Scheduled"},
-                {"A003", "Dr. Lee", "2025-02-05", "11:00 AM", "Scheduled"}
-        };
-
-        // Create a table model with the data
-        model = new DefaultTableModel(data, columns);
+        String[] columns = {"ID", "Patient Name", "Doctor", "Date", "Time", "Status"};
+        model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
 
-        // Add table to scroll pane for better usability
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
 
-        // Panel for buttons (Add Appointment and Cancel Appointment)
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
 
-        JButton addButton = new JButton("Add New Appointment");
-        addButton.addActionListener(e -> addAppointment());
-        buttonPanel.add(addButton);
+        JButton scheduleButton = new JButton("Schedule Appointment");
+        scheduleButton.addActionListener(e -> scheduleAppointment());
+        if (!userRole.equalsIgnoreCase("patient")) {
+            scheduleButton.setEnabled(false);
+        }
+        buttonPanel.add(scheduleButton);
 
         JButton cancelButton = new JButton("Cancel Appointment");
         cancelButton.addActionListener(e -> cancelAppointment());
@@ -49,63 +72,102 @@ public class ManageAppointmentsView extends JFrame {
 
         add(buttonPanel, BorderLayout.SOUTH);
 
-        // Button to go back to the main menu
         JButton backButton = new JButton("Back to Main Menu");
         backButton.addActionListener(e -> goBackToMainMenu());
         add(backButton, BorderLayout.NORTH);
 
+        loadAppointmentsBasedOnUser();
+
         setVisible(true);
     }
 
-    private void addAppointment() {
-        // Open a dialog to add a new appointment
-        JTextField appointmentIdField = new JTextField(10);
-        JTextField doctorField = new JTextField(10);
-        JTextField dateField = new JTextField(10);
-        JTextField timeField = new JTextField(10);
-        JTextField statusField = new JTextField(10);
+    private void loadAppointmentsBasedOnUser() {
+        try (Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb")) {
+            Statement st = conn.createStatement();
+            ResultSet rs;
+            if (userRole.equalsIgnoreCase("patient")) {
+                rs = st.executeQuery("SELECT * FROM Appointments WHERE PatientID = " + userId);
+            } else if (userRole.equalsIgnoreCase("doctor")) {
+                rs = st.executeQuery("SELECT * FROM Appointments WHERE DoctorName = '" + doctorName + "'");
+            } else {
+                rs = st.executeQuery("SELECT * FROM Appointments");
+            }
+            while (rs.next()) {
+                int appointmentId = rs.getInt("ID");
+                int patientId = rs.getInt("PatientID");
+                String patientName = getPatientName(patientId);
+                String doctor = rs.getString("DoctorName");
+                Date date = rs.getDate("AptDate");
+                String time = rs.getString("AptTime");
+                String status = rs.getString("Status");
+                model.addRow(new Object[]{appointmentId, patientName, doctor, date.toString(), time, status});
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error loading appointments.", "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
-        JPanel panel = new JPanel(new GridLayout(5, 2));
-        panel.add(new JLabel("Appointment ID:"));
-        panel.add(appointmentIdField);
-        panel.add(new JLabel("Doctor:"));
-        panel.add(doctorField);
-        panel.add(new JLabel("Date (YYYY-MM-DD):"));
-        panel.add(dateField);
-        panel.add(new JLabel("Time (HH:MM AM/PM):"));
-        panel.add(timeField);
-        panel.add(new JLabel("Status:"));
-        panel.add(statusField);
-
-        int option = JOptionPane.showConfirmDialog(this, panel, "Enter Appointment Details", JOptionPane.OK_CANCEL_OPTION);
-        if (option == JOptionPane.OK_OPTION) {
-            // Add new row to the table (this should be validated in real use cases)
-            String appointmentId = appointmentIdField.getText();
-            String doctor = doctorField.getText();
-            String date = dateField.getText();
-            String time = timeField.getText();
-            String status = statusField.getText();
-
-            // Add new appointment to the model
-            model.addRow(new Object[]{appointmentId, doctor, date, time, status});
+    private void scheduleAppointment() {
+        if (loggedInPatient != null) {
+            new AppointmentWizard(userRole, loggedInPatient);
+            dispose();
+        } else {
+            JOptionPane.showMessageDialog(this, "Only patients can schedule new appointments.");
         }
     }
 
     private void cancelAppointment() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow >= 0) {
-            // Get the Appointment ID and cancel the selected appointment
-            String appointmentId = (String) table.getValueAt(selectedRow, 0);
-            JOptionPane.showMessageDialog(this, "Canceling appointment: " + appointmentId);
-            // Remove the canceled appointment from the table
-            model.removeRow(selectedRow);
+            Object value = table.getValueAt(selectedRow, 0);
+            int appointmentId = Integer.parseInt(value.toString());
+            int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to cancel appointment #" + appointmentId + "?", "Confirm Cancel", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                if (deleteAppointmentFromDatabase(appointmentId)) {
+                    model.removeRow(selectedRow);
+                    JOptionPane.showMessageDialog(this, "Appointment cancelled.");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Failed to cancel appointment.");
+                }
+            }
         } else {
-            JOptionPane.showMessageDialog(this, "Please select an appointment to cancel.");
+            JOptionPane.showMessageDialog(this, "Please select an appointment first.");
         }
     }
 
+    private boolean deleteAppointmentFromDatabase(int appointmentId) {
+        try (Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb")) {
+            Statement st = conn.createStatement();
+            int rowsDeleted = st.executeUpdate("DELETE FROM Appointments WHERE ID = " + appointmentId);
+            return rowsDeleted > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private String getPatientName(int patientId) {
+        try (Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb")) {
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery("SELECT PatientName FROM Patient WHERE PatientID = " + patientId);
+            if (rs.next()) {
+                return rs.getString("PatientName");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "Unknown";
+    }
+
     private void goBackToMainMenu() {
+        if (loggedInPatient != null) {
+            new MainMenuView(userRole, loggedInPatient);
+        } else if (loggedInDoctor != null) {
+            new MainMenuView(userRole, loggedInDoctor);
+        } else {
+            new MainMenuView(userRole);
+        }
         dispose();
-        new MainMenuView(userRole); // Pass the user role when returning to the main menu
     }
 }

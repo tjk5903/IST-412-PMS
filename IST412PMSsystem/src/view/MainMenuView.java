@@ -1,31 +1,49 @@
 package view;
 
+import model.Patient;
+import model.Doctor;
 import view.LoginView;
-
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class MainMenuView extends JFrame {
     private String userRole;
+    private Patient loggedInPatient;
+    private Doctor loggedInDoctor;
 
-    // Constructor now accepts the role passed from the login view
+    public MainMenuView(String role, Patient loggedInPatient) {
+        this.userRole = role;
+        this.loggedInPatient = loggedInPatient;
+        this.loggedInDoctor = null;
+        setupUI();
+    }
+
+    public MainMenuView(String role, Doctor doctor) {
+        this.userRole = role;
+        this.loggedInPatient = null;
+        this.loggedInDoctor = doctor;
+        setupUI();
+    }
+
     public MainMenuView(String role) {
         this.userRole = role;
-        setTitle("Main Menu - " + role.toUpperCase());
+        this.loggedInPatient = null;
+        this.loggedInDoctor = null;
+        setupUI();
+    }
+
+    private void setupUI() {
+        setTitle("Main Menu - " + userRole.toUpperCase());
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new GridLayout(0, 1)); // Vertical layout
+        setLayout(new GridLayout(0, 1));
 
-        // Welcome message
-        JLabel welcomeLabel = new JLabel("Welcome, " + role.toUpperCase(), SwingConstants.CENTER);
+        JLabel welcomeLabel = new JLabel("Welcome, " + userRole.toUpperCase(), SwingConstants.CENTER);
         add(welcomeLabel);
 
-        // Add role-based buttons
         setupRoleBasedButtons();
 
-        // Logout button to return to the login view
         JButton logoutButton = new JButton("Logout");
         logoutButton.addActionListener(e -> logout());
         add(logoutButton);
@@ -33,12 +51,12 @@ public class MainMenuView extends JFrame {
         setVisible(true);
     }
 
-    // Set up role-based buttons based on the user role
     private void setupRoleBasedButtons() {
         switch (userRole.toLowerCase()) {
             case "doctor":
                 addButton("View Patient Records", e -> openView("ViewPatientRecords"));
                 addButton("Prescribe Medication", e -> openView("PrescribeMedication"));
+                addButton("Manage Appointments", e -> openView("ManageAppointments"));
                 break;
             case "patient":
                 addButton("View Prescriptions", e -> openView("ViewPrescriptions"));
@@ -56,27 +74,24 @@ public class MainMenuView extends JFrame {
             default:
                 JOptionPane.showMessageDialog(this, "Unknown Role!", "Error", JOptionPane.ERROR_MESSAGE);
                 dispose();
-                new LoginView(); // Return to login if role is invalid
+                new LoginView();
                 break;
         }
     }
 
-    // Helper method to add buttons for each view
     private void addButton(String text, ActionListener action) {
         JButton button = new JButton(text);
         button.addActionListener(action);
         add(button);
     }
 
-    // Open the corresponding view for the user role
     private void openView(String viewName) {
-        // Close the current menu and open the requested view
         switch (viewName) {
             case "ViewPatientRecords":
-                new ViewPatientRecordsView(userRole); // Open the Patient Records view
+                new ViewPatientRecordsView(userRole);
                 break;
             case "PrescribeMedication":
-                new PrescribeMedicationView(userRole); // Open the Prescribe Medication view
+                new PrescribeMedicationView(userRole);
                 break;
             case "ManageDoctors":
                 new ManageDoctorsView();
@@ -88,29 +103,33 @@ public class MainMenuView extends JFrame {
                 new InsuranceVerificationView();
                 break;
             case "ViewPrescriptions":
-                new ViewPrescriptionsView(userRole); // Open the View Prescriptions view for the patient
+                new ViewPrescriptionsView(userRole, loggedInPatient);
                 break;
             case "ManageAppointments":
-                new ManageAppointmentsView(userRole); // Open the Manage Appointments view
+                if (userRole.equalsIgnoreCase("patient")) {
+                    new ManageAppointmentsView(userRole, loggedInPatient);
+                } else if (userRole.equalsIgnoreCase("doctor")) {
+                    new ManageAppointmentsView(userRole, loggedInDoctor);
+                } else {
+                    new ManageAppointmentsView(userRole);
+                }
                 break;
             case "ProcessPrescriptions":
-                new ProcessPrescriptionsView(); // Open the Process Prescriptions view
+                new ProcessPrescriptionsView();
                 break;
             case "OrderMedications":
-                new OrderMedicationsView(); // Open the Order Medications view
+                new OrderMedicationsView();
                 break;
             default:
                 JOptionPane.showMessageDialog(this, "View not found!", "Error", JOptionPane.ERROR_MESSAGE);
                 break;
         }
-        dispose(); // Close the current menu
+        dispose();
     }
 
-
-    // Logout and go back to the login screen
     private void logout() {
         JOptionPane.showMessageDialog(this, "Logging out...");
-        dispose(); // Close the current view
-        new LoginView(); // Go back to login screen
+        dispose();
+        new LoginView();
     }
 }
