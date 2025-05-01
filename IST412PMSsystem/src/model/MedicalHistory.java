@@ -4,14 +4,13 @@ import java.util.List;
 
 public class MedicalHistory {
     private Patient patient;
-    private List<String> records;  // Could include diagnosis, treatments, medications, etc.
+    private List<String> records;
 
     public MedicalHistory(Patient patient, List<String> records) {
         this.patient = patient;
         this.records = records;
     }
 
-    // Getters and setters
     public Patient getPatient() {
         return patient;
     }

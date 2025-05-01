@@ -12,7 +12,6 @@ import java.util.List;
 
 public class DoctorController {
 
-    // Adds a new doctor to the database
     public void addDoctor(String name, String specialty, String contact, String password, String login) {
         Doctor doctor = UserFactory.createDoctor(name, contact, password, login, specialty);
 
@@ -23,7 +22,6 @@ public class DoctorController {
         }
     }
 
-    // Retrieves all doctors from the database
     public List<Doctor> getAllDoctors() {
         List<Doctor> doctors = new ArrayList<>();
 
@@ -51,7 +49,6 @@ public class DoctorController {
         return doctors;
     }
 
-    // Displays all doctors in console
     public void displayDoctors() {
         List<Doctor> doctors = getAllDoctors();
         for (Doctor doctor : doctors) {

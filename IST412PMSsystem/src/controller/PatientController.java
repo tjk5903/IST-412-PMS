@@ -14,7 +14,6 @@ public class PatientController {
 
     private final String DB_URL = "jdbc:mysql://localhost:3306/healthPlusDB?user=root&password=root123&useSSL=false";
 
-    // ✅ Adds a patient to the DB using the UserFactory
     public void addPatient(String name, String contact, String password, String login, int age, String disease) {
         Patient patient = UserFactory.createPatient(name, contact, password, login, age, disease);
 
@@ -25,7 +24,6 @@ public class PatientController {
         }
     }
 
-    // ✅ Pulls patients from the DB
     public List<Patient> getAllPatients() {
         List<Patient> patients = new ArrayList<>();
 
@@ -40,7 +38,6 @@ public class PatientController {
                 int age = rs.getInt("Age");
                 String disease = rs.getString("Disease");
 
-                // Dummy data for fields not in table
                 Patient patient = new Patient(userID, name, age, "Unknown", "N/A", "N/A", "N/A", "N/A", "Patient");
                 patients.add(patient);
             }
@@ -53,7 +50,6 @@ public class PatientController {
         return patients;
     }
 
-    // ✅ Print all patient info
     public void displayPatients() {
         List<Patient> patients = getAllPatients();
         for (Patient patient : patients) {

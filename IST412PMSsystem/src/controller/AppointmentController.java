@@ -3,8 +3,9 @@ package controller;
 import model.Appointment;
 import model.Observer;
 
-import javax.swing.*;
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -46,6 +47,24 @@ public class AppointmentController {
                     appointment.getTime() + "', '" +
                     appointment.getStatus().replace("'", "''") + "')";
             st.executeUpdate(sql);
+            Statement st1 = conn.createStatement();
+            ResultSet doctorLogin = st1.executeQuery("SELECT UserLogin FROM User WHERE UserName = '" + appointment.getDoctor().getName().replace("'", "''") + "'");
+            String name = "unknown";
+            if (doctorLogin.next()) {
+                name = doctorLogin.getString("UserLogin");
+            }
+            String eventLogged = appointment.getPatient().getLogin() + " scheduled appointment on "
+                    + appointment.getDate() + " at " + appointment.getTime() + " with " + name;
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String formattedDateTime = now.format(formatter);
+            Statement st2 = conn.createStatement();
+            String sql2 = "INSERT INTO AdminLogs (UserID, UserName, DateOccurred, EventLogged) VALUES (" +
+                    appointment.getPatient().getUserID() + ", '" +
+                    appointment.getPatient().getLogin().replace("'", "''") + "', '" +
+                    formattedDateTime.replace("'", "''") + "', '" +
+                    eventLogged.replace("'", "''") + "')";
+            st2.executeUpdate(sql2);
         } catch (SQLException e) {
             e.printStackTrace();
         }

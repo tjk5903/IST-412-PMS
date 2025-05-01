@@ -7,13 +7,15 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 public class ManageAppointmentsView extends JFrame {
     private String userRole;
     private int userId;
     private String doctorName;
     private Doctor loggedInDoctor;
-
     private Patient loggedInPatient;
     private DefaultTableModel model;
     private JTable table;
@@ -21,8 +23,8 @@ public class ManageAppointmentsView extends JFrame {
     public ManageAppointmentsView(String userRole, Patient patient) {
         this.userRole = userRole;
         this.userId = patient.getUserID();
-        this.doctorName = null;
         this.loggedInPatient = patient;
+        this.doctorName = null;
         initUI();
     }
 
@@ -52,7 +54,6 @@ public class ManageAppointmentsView extends JFrame {
         String[] columns = {"ID", "Patient Name", "Doctor", "Date", "Time", "Status"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
-
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
 
@@ -70,14 +71,13 @@ public class ManageAppointmentsView extends JFrame {
         cancelButton.addActionListener(e -> cancelAppointment());
         buttonPanel.add(cancelButton);
 
-        add(buttonPanel, BorderLayout.SOUTH);
-
         JButton backButton = new JButton("Back to Main Menu");
         backButton.addActionListener(e -> goBackToMainMenu());
-        add(backButton, BorderLayout.NORTH);
+        buttonPanel.add(backButton);
+
+        add(buttonPanel, BorderLayout.SOUTH);
 
         loadAppointmentsBasedOnUser();
-
         setVisible(true);
     }
 
@@ -139,6 +139,39 @@ public class ManageAppointmentsView extends JFrame {
     private boolean deleteAppointmentFromDatabase(int appointmentId) {
         try (Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb")) {
             Statement st = conn.createStatement();
+            conn.setAutoCommit(true);
+            Statement stmt = conn.createStatement();
+            ResultSet appointmentInfo = stmt.executeQuery("SELECT * FROM Appointments WHERE ID = " + appointmentId);
+            String aptDate = "unknown";
+            String aptTime = "unknown";
+            if (appointmentInfo.next()) {
+                aptDate = appointmentInfo.getString("AptDate");
+                aptTime = appointmentInfo.getString("AptTime");
+            }
+            String eventLogged = "";
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String formattedDateTime = now.format(formatter);
+            String sql = "";
+            if (Objects.equals(userRole, "patient")){
+                eventLogged = loggedInPatient.getLogin() + " cancelled appointment on " + aptDate + " at " + aptTime +
+                        " (ID: " + appointmentId + ")";
+                sql = "INSERT INTO AdminLogs (UserID, UserName, DateOccurred, EventLogged) VALUES (" +
+                        loggedInPatient.getUserID() + ", '" +
+                        loggedInPatient.getLogin().replace("'", "''") + "', '" +
+                        formattedDateTime.replace("'", "''") + "', '" +
+                        eventLogged.replace("'", "''") + "')";
+            }
+            else{
+                eventLogged = loggedInDoctor.getLogin() + " cancelled appointment on " + aptDate + " at " + aptTime +
+                        " (ID: " + appointmentId + ")";
+                sql = "INSERT INTO AdminLogs (UserID, UserName, DateOccurred, EventLogged) VALUES (" +
+                        loggedInDoctor.getUserID() + ", '" +
+                        loggedInDoctor.getLogin().replace("'", "''") + "', '" +
+                        formattedDateTime.replace("'", "''") + "', '" +
+                        eventLogged.replace("'", "''") + "')";
+            }
+            st.executeUpdate(sql);
             int rowsDeleted = st.executeUpdate("DELETE FROM Appointments WHERE ID = " + appointmentId);
             return rowsDeleted > 0;
         } catch (SQLException e) {
@@ -163,10 +196,9 @@ public class ManageAppointmentsView extends JFrame {
     private void goBackToMainMenu() {
         if (loggedInPatient != null) {
             new MainMenuView(userRole, loggedInPatient);
-        } else if (loggedInDoctor != null) {
+        }
+        else {
             new MainMenuView(userRole, loggedInDoctor);
-        } else {
-            new MainMenuView(userRole);
         }
         dispose();
     }

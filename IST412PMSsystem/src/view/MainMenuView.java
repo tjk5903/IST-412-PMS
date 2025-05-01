@@ -1,35 +1,46 @@
 package view;
 
+import model.Admin;
 import model.Patient;
 import model.Doctor;
 import view.LoginView;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class MainMenuView extends JFrame {
     private String userRole;
     private Patient loggedInPatient;
     private Doctor loggedInDoctor;
+    private Admin loggedInAdmin;
 
     public MainMenuView(String role, Patient loggedInPatient) {
         this.userRole = role;
         this.loggedInPatient = loggedInPatient;
         this.loggedInDoctor = null;
+        this.loggedInAdmin = null;
         setupUI();
     }
 
     public MainMenuView(String role, Doctor doctor) {
         this.userRole = role;
         this.loggedInPatient = null;
+        this.loggedInAdmin = null;
         this.loggedInDoctor = doctor;
         setupUI();
     }
 
-    public MainMenuView(String role) {
+    public MainMenuView(String role, Admin admin) {
         this.userRole = role;
         this.loggedInPatient = null;
         this.loggedInDoctor = null;
+        this.loggedInAdmin = admin;
         setupUI();
     }
 
@@ -39,13 +50,29 @@ public class MainMenuView extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new GridLayout(0, 1));
 
-        JLabel welcomeLabel = new JLabel("Welcome, " + userRole.toUpperCase(), SwingConstants.CENTER);
-        add(welcomeLabel);
+        if (loggedInPatient != null){
+            JLabel welcomeLabel = new JLabel("Welcome, " + loggedInPatient.getName(), SwingConstants.CENTER);
+            add(welcomeLabel);
+        }
+        else if (loggedInDoctor != null){
+            JLabel welcomeLabel = new JLabel("Welcome, " + loggedInDoctor.getName(), SwingConstants.CENTER);
+            add(welcomeLabel);
+        }
+        else{
+            JLabel welcomeLabel = new JLabel("Welcome, " + loggedInAdmin.getName(), SwingConstants.CENTER);
+            add(welcomeLabel);
+        }
 
         setupRoleBasedButtons();
 
         JButton logoutButton = new JButton("Logout");
-        logoutButton.addActionListener(e -> logout());
+        logoutButton.addActionListener(e -> {
+            try {
+                logout();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         add(logoutButton);
 
         setVisible(true);
@@ -69,7 +96,7 @@ public class MainMenuView extends JFrame {
             case "admin":
                 addButton("Manage Doctors", e -> openView("ManageDoctors"));
                 addButton("Manage Patients", e -> openView("ManagePatients"));
-                addButton("Insurance Verification", e -> openView("InsuranceVerification"));
+                addButton("View Logs", e -> openView("ViewLogs"));
                 break;
             default:
                 JOptionPane.showMessageDialog(this, "Unknown Role!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -88,19 +115,19 @@ public class MainMenuView extends JFrame {
     private void openView(String viewName) {
         switch (viewName) {
             case "ViewPatientRecords":
-                new ViewPatientRecordsView(userRole);
+                new ViewPatientRecordsView(userRole, loggedInDoctor);
                 break;
             case "PrescribeMedication":
-                new PrescribeMedicationView(userRole);
+                new PrescribeMedicationView(userRole, loggedInDoctor);
                 break;
             case "ManageDoctors":
-                new ManageDoctorsView();
+                new ManageDoctorsView(userRole, loggedInAdmin);
                 break;
             case "ManagePatients":
-                new ManagePatientsView();
+                new ManagePatientsView(userRole, loggedInAdmin);
                 break;
-            case "InsuranceVerification":
-                new InsuranceVerificationView();
+            case "ViewLogs":
+                new ViewLogsView(userRole, loggedInAdmin);
                 break;
             case "ViewPrescriptions":
                 new ViewPrescriptionsView(userRole, loggedInPatient);
@@ -114,12 +141,6 @@ public class MainMenuView extends JFrame {
                     new ManageAppointmentsView(userRole);
                 }
                 break;
-            case "ProcessPrescriptions":
-                new ProcessPrescriptionsView();
-                break;
-            case "OrderMedications":
-                new OrderMedicationsView();
-                break;
             default:
                 JOptionPane.showMessageDialog(this, "View not found!", "Error", JOptionPane.ERROR_MESSAGE);
                 break;
@@ -127,9 +148,52 @@ public class MainMenuView extends JFrame {
         dispose();
     }
 
-    private void logout() {
+    private void logout() throws SQLException {
         JOptionPane.showMessageDialog(this, "Logging out...");
         dispose();
+        Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb");
+        String eventLogged = "";
+        if (loggedInPatient != null) {
+            eventLogged = loggedInPatient.getLogin() + " logout";
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String formattedDateTime = now.format(formatter);
+            Statement st = conn.createStatement();
+            String sql = "INSERT INTO AdminLogs (UserID, UserName, DateOccurred, EventLogged) VALUES (" +
+                    loggedInPatient.getUserID() + ", '" +
+                    loggedInPatient.getLogin().replace("'", "''") + "', '" +
+                    formattedDateTime.replace("'", "''") + "', '" +
+                    eventLogged.replace("'", "''") + "')";
+            st.executeUpdate(sql);
+        }
+        else if (loggedInDoctor != null){
+            eventLogged = loggedInDoctor.getLogin() + " logout";
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String formattedDateTime = now.format(formatter);
+            Statement st = conn.createStatement();
+            String sql = "INSERT INTO AdminLogs (UserID, UserName, DateOccurred, EventLogged) VALUES (" +
+                    loggedInDoctor.getUserID() + ", '" +
+                    loggedInDoctor.getLogin().replace("'", "''") + "', '" +
+                    formattedDateTime.replace("'", "''") + "', '" +
+                    eventLogged.replace("'", "''") + "')";
+            st.executeUpdate(sql);
+        }
+        else{
+            eventLogged = loggedInAdmin.getLogin() + " logout";
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String formattedDateTime = now.format(formatter);
+            Statement st = conn.createStatement();
+            String sql = "INSERT INTO AdminLogs (UserID, UserName, DateOccurred, EventLogged) VALUES (" +
+                    loggedInAdmin.getUserID() + ", '" +
+                    loggedInAdmin.getLogin().replace("'", "''") + "', '" +
+                    formattedDateTime.replace("'", "''") + "', '" +
+                    eventLogged.replace("'", "''") + "')";
+            st.executeUpdate(sql);
+        }
+
+        conn.close();
         new LoginView();
     }
 }

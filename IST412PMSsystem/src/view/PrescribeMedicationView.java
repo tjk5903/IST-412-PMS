@@ -1,11 +1,15 @@
 package view;
 
+import model.Doctor;
+
 import javax.swing.*;
 import java.awt.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,8 +22,11 @@ public class PrescribeMedicationView extends JFrame {
     private JTextField dosageField;
     private JTextField frequencyField;
 
-    public PrescribeMedicationView(String userRole) {
+    private Doctor loggedInDoctor;
+
+    public PrescribeMedicationView(String userRole, Doctor loggedInDoctor) {
         this.userRole = userRole;
+        this.loggedInDoctor = loggedInDoctor;
         setTitle("Prescribe Medication");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -75,9 +82,26 @@ public class PrescribeMedicationView extends JFrame {
                         dosage.replace("'", "''") + "', '" +
                         frequency.replace("'", "''") + "')";
                 st.executeUpdate(sql);
+                LocalDateTime now = LocalDateTime.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                String formattedDateTime = now.format(formatter);Statement stmt = conn.createStatement();
+                ResultSet patientLogin = stmt.executeQuery("SELECT * FROM User WHERE UserID = " + patientId);
+                String name = "unknown";
+                if (patientLogin.next()) {
+                    name = patientLogin.getString("UserLogin");
+                }
+
+                String eventLogged = loggedInDoctor.getLogin() + " prescribed '" + medication + "' to " + name;
+                String sql1 = "INSERT INTO AdminLogs (UserID, UserName, DateOccurred, EventLogged) VALUES (" +
+                        loggedInDoctor.getUserID() + ", '" +
+                        loggedInDoctor.getLogin().replace("'", "''") + "', '" +
+                        formattedDateTime.replace("'", "''") + "', '" +
+                        eventLogged.replace("'", "''") + "')";
+                st.executeUpdate(sql1);
                 JOptionPane.showMessageDialog(this, "Medication prescribed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 dispose();
-                new MainMenuView(userRole);
+                conn.close();
+                new MainMenuView(userRole, loggedInDoctor);
             } catch (Exception e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(this, "Error prescribing medication.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -103,6 +127,6 @@ public class PrescribeMedicationView extends JFrame {
 
     private void goBackToMainMenu() {
         dispose();
-        new MainMenuView(userRole);
+        new MainMenuView(userRole, loggedInDoctor);
     }
 }

@@ -1,47 +1,54 @@
 package view;
 
+import model.Admin;
 import model.Patient;
 import model.UserFactory;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class ManagePatientsView extends JFrame {
     private JTable patientsTable;
     private DefaultTableModel tableModel;
     private JButton addPatientButton, editPatientButton, deletePatientButton, backButton;
+    private Admin loggedInAdmin;
+    private String userRole;
 
-    public ManagePatientsView() {
+
+    public ManagePatientsView(String userRole, Admin loggedInAdmin) {
+        this.loggedInAdmin = loggedInAdmin;
+        this.userRole = userRole;
         setTitle("Manage Patients");
         setSize(600, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Table column headers
         String[] columnNames = {"Patient ID", "Name", "Age", "Disease"};
         tableModel = new DefaultTableModel(columnNames, 0);
         patientsTable = new JTable(tableModel);
 
-        // Load from database
         loadPatientsFromDatabase();
 
-        // Scrollable table
         JScrollPane scrollPane = new JScrollPane(patientsTable);
         add(scrollPane, BorderLayout.CENTER);
 
-        // Buttons
         JPanel buttonPanel = new JPanel();
         addPatientButton = new JButton("Add Patient");
         editPatientButton = new JButton("Edit Patient");
         deletePatientButton = new JButton("Delete Patient");
         backButton = new JButton("Back");
 
-        addPatientButton.addActionListener(e -> addPatient());
+        addPatientButton.addActionListener(e -> {
+            try {
+                addPatient();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         editPatientButton.addActionListener(e -> editPatient());
         deletePatientButton.addActionListener(e -> deletePatient());
         backButton.addActionListener(e -> goBack());
@@ -77,15 +84,68 @@ public class ManagePatientsView extends JFrame {
         }
     }
 
-    private void addPatient() {
+    public void addPatient() throws SQLException {
         String name = JOptionPane.showInputDialog(this, "Enter Patient Name:");
+        if (name == null) return;
         String contact = JOptionPane.showInputDialog(this, "Enter Contact Info:");
-        String login = JOptionPane.showInputDialog(this, "Enter Login Username:");
-        String password = JOptionPane.showInputDialog(this, "Enter Password:");
-        int age = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter Age:"));
-        String disease = JOptionPane.showInputDialog(this, "Enter Disease:");
+        if (contact == null) return;
+        String login = null;
+        while (true) {
+            login = JOptionPane.showInputDialog(this, "Enter Login Username:");
+            if (login == null || login.trim().isEmpty()) return;
 
+            if (isUsernameTaken(login.trim())) {
+                JOptionPane.showMessageDialog(this, "That username is already taken. Please choose a different one.", "Username Taken", JOptionPane.WARNING_MESSAGE);
+            } else {
+                break;
+            }
+        }
+        if (isUsernameTaken(login)) {
+            JOptionPane.showMessageDialog(this, "That username is already taken. Please choose a different one.", "Username Taken", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        String password = JOptionPane.showInputDialog(this, "Enter Password:");
+        if (password == null) return;
+        Integer age = null;
+        while (true) {
+            String ageStr = JOptionPane.showInputDialog(this, "Enter Age:");
+            if (ageStr == null || ageStr.trim().isEmpty()) return;
+
+            try {
+                age = Integer.valueOf(ageStr.trim());
+                break;
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Please enter a valid whole number.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        JComboBox<String> diseaseDropDown = new JComboBox<>();
+        diseaseDropDown.addItem("Flu");
+        diseaseDropDown.addItem("COVID-19");
+        diseaseDropDown.addItem("Cold");
+        diseaseDropDown.addItem("Strep");
+        diseaseDropDown.addItem("Pneumonia");
+        diseaseDropDown.addItem("Other");
+        int result = JOptionPane.showConfirmDialog(this, diseaseDropDown, "Select Specialization", JOptionPane.OK_CANCEL_OPTION);
+        if (result != JOptionPane.OK_OPTION) {
+            return;
+        }
+        String disease = (String) diseaseDropDown.getSelectedItem();
         Patient patient = UserFactory.createPatient(name, contact, password, login, age, disease);
+        Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb");
+        //Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/healthPlusDB?user=root&password=root123&useSSL=false");
+        String eventLogged = "New patient '" + name + "' created by " + loggedInAdmin.getLogin();
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDateTime = now.format(formatter);
+        Statement st = conn.createStatement();
+        String sql = "INSERT INTO AdminLogs (UserID, UserName, DateOccurred, EventLogged) VALUES (" +
+                loggedInAdmin.getUserID() + ", '" +
+                loggedInAdmin.getLogin().replace("'", "''") + "', '" +
+                formattedDateTime.replace("'", "''") + "', '" +
+                eventLogged.replace("'", "''") + "')";
+        st.executeUpdate(sql);
+        JOptionPane.showMessageDialog(this, "Patient Created Successfully");
+        conn.close();
 
         if (patient != null) {
             tableModel.addRow(new Object[]{patient.getUserID(), patient.getName(), age, disease});
@@ -123,8 +183,24 @@ public class ManagePatientsView extends JFrame {
                     Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb");
                     //Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/healthPlusDB?user=root&password=root123&useSSL=false");
                     Statement stmt = conn.createStatement();
+                    ResultSet patientLogin = stmt.executeQuery("SELECT * FROM User WHERE UserID = " + patientID);
+                    String name = "unknown";
+                    if (patientLogin.next()) {
+                        name = patientLogin.getString("UserLogin");
+                    }
+                    String eventLogged = "Patient '" + name + "' deleted by " + loggedInAdmin.getLogin();
                     stmt.executeUpdate("DELETE FROM Patient WHERE PatientID = " + patientID);
                     stmt.executeUpdate("DELETE FROM User WHERE UserID = " + patientID);
+                    LocalDateTime now = LocalDateTime.now();
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    String formattedDateTime = now.format(formatter);
+                    Statement st = conn.createStatement();
+                    String sql = "INSERT INTO AdminLogs (UserID, UserName, DateOccurred, EventLogged) VALUES (" +
+                            loggedInAdmin.getUserID() + ", '" +
+                            loggedInAdmin.getLogin().replace("'", "''") + "', '" +
+                            formattedDateTime.replace("'", "''") + "', '" +
+                            eventLogged.replace("'", "''") + "')";
+                    st.executeUpdate(sql);
                     conn.close();
 
                     tableModel.removeRow(selectedRow);
@@ -139,8 +215,26 @@ public class ManagePatientsView extends JFrame {
         }
     }
 
+    private boolean isUsernameTaken(String username) {
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb");
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) AS count FROM [User] WHERE UserLogin = '" + username + "'");
+            if (rs.next()) {
+                int count = rs.getInt("count");
+                conn.close();
+                return count > 0;
+            }
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error checking username.", "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
+        return false;
+    }
+
     private void goBack() {
         this.dispose();
-        new MainMenuView("admin");
+        new MainMenuView(userRole, loggedInAdmin);
     }
 }
