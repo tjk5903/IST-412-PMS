@@ -4,64 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1335a7c2-9c3f-46cd-b887-5a0cbc7bab60" name="Changes" comment="Added Appointment Scheduling and Prescription Uses Cases. Patients can schedule appointments, and patients and doctors can see appointments. Doctors are able to prescribe medication and patients are able to view their medications.">
-      <change afterPath="$PROJECT_DIR$/.idea/IST-412-PMS.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/IST412PMSsystem/src/view/AppointmentWizard.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/controller/AppointmentController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/controller/DoctorController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/controller/PatientController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/controller/PrescriptionController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/controller/UserController$1.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/controller/UserController$2.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/controller/UserController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/healthPlusDatabase1.accdb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/model/Admin.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/model/Appointment.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/model/Doctor.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/model/LoginUser.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/model/MedicalHistory.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/model/Observer.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/model/Patient.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/model/Prescription.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/model/User.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/model/UserFactory.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/repository/PrescriptionRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/testharness/TestHarness.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/view/AppointmentWizard.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/view/LoginView.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/view/ManageAppointmentsView.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/view/ManageDoctorsView.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/view/ManagePatientsView.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/view/PrescribeMedicationView.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/view/ViewPatientRecordsView.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/view/ViewPrescriptionsView.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/controller/AdminController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/controller/AppointmentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/IST412PMSsystem/src/controller/AppointmentController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/controller/BillingController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/controller/DoctorController.java" beforeDir="false" afterPath="$PROJECT_DIR$/IST412PMSsystem/src/controller/DoctorController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/controller/PatientController.java" beforeDir="false" afterPath="$PROJECT_DIR$/IST412PMSsystem/src/controller/PatientController.java" afterDir="false" />
+    <list default="true" id="1335a7c2-9c3f-46cd-b887-5a0cbc7bab60" name="Changes" comment="Basically finished product. Added logs for everything that is created and successful and failed logins, patients can create their own accounts, added dropdowns throughout, doctors can edit patient prescriptions and diagnoses. Deleted unnecessary files and repurposed insurance to logs.">
+      <change afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/view/MainMenuView.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/healthPlusDatabase1.accdb" beforeDir="false" afterPath="$PROJECT_DIR$/IST412PMSsystem/src/healthPlusDatabase1.accdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/model/Admin.java" beforeDir="false" afterPath="$PROJECT_DIR$/IST412PMSsystem/src/model/Admin.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/model/Billing.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/model/MedicalHistory.java" beforeDir="false" afterPath="$PROJECT_DIR$/IST412PMSsystem/src/model/MedicalHistory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/model/NotificationService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/view/AdminView.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/view/DoctorView.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/view/InsuranceVerificationView.java" beforeDir="false" afterPath="$PROJECT_DIR$/IST412PMSsystem/src/view/ViewLogsView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/view/LoginView.java" beforeDir="false" afterPath="$PROJECT_DIR$/IST412PMSsystem/src/view/LoginView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/view/MainMenuView.java" beforeDir="false" afterPath="$PROJECT_DIR$/IST412PMSsystem/src/view/MainMenuView.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/view/ManageAppointmentsView.java" beforeDir="false" afterPath="$PROJECT_DIR$/IST412PMSsystem/src/view/ManageAppointmentsView.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/view/ManageDoctorsView.java" beforeDir="false" afterPath="$PROJECT_DIR$/IST412PMSsystem/src/view/ManageDoctorsView.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/view/ManagePatientsView.java" beforeDir="false" afterPath="$PROJECT_DIR$/IST412PMSsystem/src/view/ManagePatientsView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/view/OrderMedicationsView.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/view/PatientView.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/view/PrescribeMedicationView.java" beforeDir="false" afterPath="$PROJECT_DIR$/IST412PMSsystem/src/view/PrescribeMedicationView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/view/ProcessPrescriptionsView.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/view/ViewPatientRecordsView.java" beforeDir="false" afterPath="$PROJECT_DIR$/IST412PMSsystem/src/view/ViewPatientRecordsView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IST412PMSsystem/src/view/ViewLogsView.java" beforeDir="false" afterPath="$PROJECT_DIR$/IST412PMSsystem/src/view/ViewLogsView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/IST-412-PMS/healthPlusDatabase1.accdb" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/IST-412-PMS/healthPlusDatabase1.accdb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -179,7 +131,8 @@
       <workItem from="1745963000491" duration="6109000" />
       <workItem from="1746020697699" duration="1601000" />
       <workItem from="1746022501511" duration="1456000" />
-      <workItem from="1746039394693" duration="24028000" />
+      <workItem from="1746039394693" duration="24618000" />
+      <workItem from="1746377369645" duration="2351000" />
     </task>
     <task id="LOCAL-00001" summary="Added Appointment Scheduling and Prescription Uses Cases. Patients can schedule appointments, and patients and doctors can see appointments. Doctors are able to prescribe medication and patients are able to view their medications.">
       <option name="closed" value="true" />
@@ -189,7 +142,15 @@
       <option name="project" value="LOCAL" />
       <updated>1745807518187</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Basically finished product. Added logs for everything that is created and successful and failed logins, patients can create their own accounts, added dropdowns throughout, doctors can edit patient prescriptions and diagnoses. Deleted unnecessary files and repurposed insurance to logs.">
+      <option name="closed" value="true" />
+      <created>1746064656632</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1746064656632</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -209,6 +170,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Merge remote-tracking branch 'origin/main'&#10;&#10;# Conflicts:&#10;#&#9;IST412PMSsystem/src/view/ViewPrescriptionsView.java" />
     <MESSAGE value="Added Appointment Scheduling and Prescription Uses Cases. Patients can schedule appointments, and patients and doctors can see appointments. Doctors are able to prescribe medication and patients are able to view their medications." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added Appointment Scheduling and Prescription Uses Cases. Patients can schedule appointments, and patients and doctors can see appointments. Doctors are able to prescribe medication and patients are able to view their medications." />
+    <MESSAGE value="Basically finished product. Added logs for everything that is created and successful and failed logins, patients can create their own accounts, added dropdowns throughout, doctors can edit patient prescriptions and diagnoses. Deleted unnecessary files and repurposed insurance to logs." />
+    <option name="LAST_COMMIT_MESSAGE" value="Basically finished product. Added logs for everything that is created and successful and failed logins, patients can create their own accounts, added dropdowns throughout, doctors can edit patient prescriptions and diagnoses. Deleted unnecessary files and repurposed insurance to logs." />
   </component>
 </project>

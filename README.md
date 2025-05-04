@@ -2,8 +2,18 @@
 <!-- ABOUT THE PROJECT -->
 # **About The Project**
 ___
->This project is about creating a functional Patient Management System (PMS). There are many stakeholders to think of in this situation as well as a large amount of rules and regulations to follow such as HIPAA. Within this project there should be the management of prescriptions from both sides of either the patient and the doctor/care team. The nurses and doctors should be able to see the medical history, but the nurse will not be able to edit it they will be able to leave detailed notes for the doctor to look over.
+>This project is about creating a functional Patient Management System (PMS). There are many stakeholders to think of in this situation as well as a large amount of rules and regulations to follow such as HIPAA. Within this project there should be the management of prescriptions from both sides of either the patient and the doctor/care team. Patients are able to view their prescriptions, schedule, and cancel appointments. Doctors can cancel appointments, view patient medical history, and prescribe medication. Admins can create and delete doctors and patients, along with view activity logs, such as sheduling and cancelling appointments, login and logouts, etc.
 ____
+
+# **Project Use Cases**
+> 1. **User Authentication** - users can log into their accounts using credentials stored in the database
+> 2. **Management of Patients and Doctors** - admins can create and delete patients and doctors (**Manage Patients**, **Manage Doctors**)
+> 3. **Scheduling/Managing Appointments** - patients can schedule and cancel appointments with doctors on times and dates after the current time. Doctors are able to cancel the appointments (**Manage Appointments**)
+> 4. **Prescribing Medication** - doctors can prescribe medication to patients. Patients are able to see their prescriptions, and doctors are able to view them in patient medical history, where they can also delete them (**Prescribe Medication**, **View Prescriptions**)
+> 5. **View Activity Logs** - admins can view activity logs around the whole system. They can see when people login, logout, create and delete users, schedule and cancel appointments, when doctors edit users, and when medications are prescribed (**View Logs**)
+> 6. **Patient Creation and Login Screen** - new patients can create an account on the login screen (**Create Account**)
+> 7. **View/Manage Patient Medical History** - doctors can see patient medical history and information. It contains patient personal information, diseases/diagnosis, and their medication. Doctors are able to change the diagnosis and prescriptions here (**View Patient Records**)
+
 
 # **Connecting to Database**
 
@@ -45,8 +55,7 @@ There are necessary drivers to download depending on what database you use.
 <!-- TESTING LOGIN INFORMATION-->
 
 # **Logins**
-> The login information for each of the important stake holders within this scenario.
-_________________________
+The login information for each of the important stake holders within this scenario.
 ## Doctors
 ### Test Doctor 1
     username: doctor1 
@@ -67,15 +76,11 @@ ___
 # **Usage**
 ___
 ## Doctors
->	View and Update the Medical Records of their patients, they are also able to prescribe their patients prescriptions on drug orders.
-## Nurses
->	View Medical Records and the ability to leave notes for a doctor on the patient an the information which they had gathered from the visit.
+>	View and Update the Medical Records of their patients, they are also able to prescribe their patients prescriptions, and cancel appointments.
 ## Patients
->	Access and View their medical records as well as the ability to order prescriptions and schedule their appointments while seeing upcoming appointments.
+>	Schedule and cancel appointments and view their prescriptions
 ## System Administrators
->   The System Admin is meant to monitor and upkeep the software and application with the modern standards and ensure that it is running properly and smoothly
-## Cybersecurity Specialists
->   Ensurance that the regulations with HIPAA as well as best practice is in place for the sensitive data which is being handled within this organization. If a security incident occurs they will also be responsible for handling and resolvign this issue.
+>   Create and delete patient and doctor users and view activity logs around the system
 ___
 <!-- CONTACT -->
 # **Contact**

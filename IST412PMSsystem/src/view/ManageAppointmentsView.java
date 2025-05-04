@@ -77,11 +77,11 @@ public class ManageAppointmentsView extends JFrame {
 
         add(buttonPanel, BorderLayout.SOUTH);
 
-        loadAppointmentsBasedOnUser();
+        loadUserAppointments();
         setVisible(true);
     }
 
-    private void loadAppointmentsBasedOnUser() {
+    private void loadUserAppointments() {
         try (Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb")) {
             Statement st = conn.createStatement();
             ResultSet rs;

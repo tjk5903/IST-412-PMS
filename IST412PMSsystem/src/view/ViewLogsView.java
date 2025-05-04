@@ -39,7 +39,7 @@ public class ViewLogsView extends JFrame {
         exportButton = new JButton("Export as CSV");
         backButton = new JButton("Back to Main Menu");
 
-        exportButton.addActionListener(e -> exportLogsToCSV());
+        exportButton.addActionListener(e -> exportLogs());
         backButton.addActionListener(e -> goBackToMainMenu());
 
         buttonPanel.add(exportButton);
@@ -69,7 +69,7 @@ public class ViewLogsView extends JFrame {
         }
     }
 
-    private void exportLogsToCSV() {
+    private void exportLogs() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Save Logs as CSV");
         int result = fileChooser.showSaveDialog(this);

@@ -94,13 +94,13 @@ public class ManagePatientsView extends JFrame {
             login = JOptionPane.showInputDialog(this, "Enter Login Username:");
             if (login == null || login.trim().isEmpty()) return;
 
-            if (isUsernameTaken(login.trim())) {
+            if (checkUsername(login.trim())) {
                 JOptionPane.showMessageDialog(this, "That username is already taken. Please choose a different one.", "Username Taken", JOptionPane.WARNING_MESSAGE);
             } else {
                 break;
             }
         }
-        if (isUsernameTaken(login)) {
+        if (checkUsername(login)) {
             JOptionPane.showMessageDialog(this, "That username is already taken. Please choose a different one.", "Username Taken", JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -215,7 +215,7 @@ public class ManagePatientsView extends JFrame {
         }
     }
 
-    private boolean isUsernameTaken(String username) {
+    private boolean checkUsername(String username) {
         try {
             Connection conn = DriverManager.getConnection("jdbc:ucanaccess://IST412PMSsystem/src/healthPlusDatabase1.accdb");
             Statement stmt = conn.createStatement();
